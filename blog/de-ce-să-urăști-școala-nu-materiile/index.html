@@ -64,6 +64,17 @@
 </head>
 <body>
   <div id="bootLoader" aria-hidden="true"><span class="boot-brand">LINISTITUL<span class="boot-tld">.ro</span></span></div>
+  <script>
+  try {
+    if (sessionStorage.getItem("linistitul_booted")) {
+      var _bl = document.getElementById("bootLoader");
+      if (_bl) _bl.remove();
+      document.documentElement.classList.remove("boot-loading");
+    } else {
+      sessionStorage.setItem("linistitul_booted", "1");
+    }
+  } catch (e) {}
+  </script>
   <a class="skip" href="#continut">Sari la conținut</a>
 
   <header class="topbar">
@@ -249,6 +260,26 @@
 
   <script>
   (function(){
+    function bootFromCache(){
+      try {
+        var nav = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+        if (!nav || typeof nav.transferSize !== "number" || nav.transferSize !== 0) return false;
+        var probe = document.querySelector(".wrap");
+        if (!probe || getComputedStyle(probe).maxWidth !== "1180px") return false;
+        var crit = ["styles.css", "fonts.googleapis.com"];
+        var res = performance.getEntriesByType("resource") || [];
+        return crit.every(function(c){
+          var hit = res.filter(function(r){ return (r.name || "").indexOf(c) !== -1; });
+          return hit.length > 0 && hit.every(function(r){ return r.transferSize === 0; });
+        });
+      } catch (e) { return false; }
+    }
+    if (bootFromCache()) {
+      var bb = document.getElementById("bootLoader");
+      if (bb) bb.remove();
+      document.documentElement.classList.remove("boot-loading");
+      window.scrollTo(0, 0);
+    }
     var t0 = Date.now();
     var startHash = window.location.hash;
     function hashTarget(){

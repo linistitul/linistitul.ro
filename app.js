@@ -494,6 +494,26 @@ async function refreshAvatar() {
 }
 
 /* ---------- Loader inițial anti-FOUC (ascunde prima pictare nestilizată) ---------- */
+function bootFromCache() {
+  try {
+    var nav = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+    if (!nav || typeof nav.transferSize !== "number" || nav.transferSize !== 0) return false;
+    // dovadă directă că CSS-ul extern e aplicat (altfel ar fi fals pozitiv pe rețea lentă)
+    var probe = document.querySelector(".wrap");
+    if (!probe || getComputedStyle(probe).maxWidth !== "1180px") return false;
+    var crit = ["styles.css", "app.js", "fonts.googleapis.com"];
+    var res = performance.getEntriesByType("resource") || [];
+    return crit.every(function (c) {
+      var hit = res.filter(function (r) { return (r.name || "").indexOf(c) !== -1; });
+      return hit.length > 0 && hit.every(function (r) { return r.transferSize === 0; });
+    });
+  } catch (e) { return false; }
+}
+if (bootFromCache()) {
+  const bb = document.getElementById("bootLoader");
+  if (bb) bb.remove();
+  document.documentElement.classList.remove("boot-loading");
+}
 const bootT0 = Date.now();
 const startHash = window.location.hash;
 function hashTarget() {
