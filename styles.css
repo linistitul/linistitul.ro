@@ -47,8 +47,7 @@ body {
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); min-width: 0; }
 .brand-avatar { border-radius: 50%; background: #222; flex: none; }
 .brand-text { display: flex; flex-direction: column; line-height: 1.3; min-width: 0; }
-.brand-name { font-weight: 800; letter-spacing: .04em; font-size: 15px; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
-.verified { color: #aaa; }
+.brand-name { font-weight: 800; letter-spacing: .04em; font-size: 15px; white-space: nowrap; }
 .brand-sub { color: var(--text-dim); font-size: 13px; white-space: nowrap; }
 .nav { display: flex; gap: 4px; margin-left: auto; }
 .nav-link {
