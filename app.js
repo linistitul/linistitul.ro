@@ -495,15 +495,23 @@ async function refreshAvatar() {
 
 /* ---------- Loader inițial anti-FOUC (ascunde prima pictare nestilizată) ---------- */
 const bootT0 = Date.now();
+const startHash = window.location.hash;
+function hashTarget() {
+  if (!startHash || startHash.length < 2) return null;
+  try { return document.getElementById(decodeURIComponent(startHash.slice(1))); }
+  catch { return null; }
+}
 try { history.scrollRestoration = "manual"; } catch {}
-window.scrollTo(0, 0);
+if (!hashTarget()) window.scrollTo(0, 0);
 function hideBootLoader() {
   const b = document.getElementById("bootLoader");
   if (!b || b.dataset.done) return;
   b.dataset.done = "1";
   setTimeout(() => {
     document.documentElement.classList.remove("boot-loading");
-    window.scrollTo(0, 0);
+    const t = hashTarget();
+    if (t) t.scrollIntoView();
+    else window.scrollTo(0, 0);
     b.classList.add("hide");
     setTimeout(() => b.remove(), 350);
   }, Math.max(0, 1200 - (Date.now() - bootT0)));

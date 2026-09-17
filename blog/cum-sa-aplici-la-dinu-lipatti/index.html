@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="ro" class="boot-loading">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -50,9 +50,22 @@
   <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
   <link rel="apple-touch-icon" href="https://yt3.googleusercontent.com/ytc/AIdro_modnbNTuRlleNjTVouvkCrV_5UEVAxuMjbnRzZcO1hdq4=s180-c-k-c0x00ffffff-no-rj" />
   <link rel="preconnect" href="https://yt3.googleusercontent.com" />
+  <style>
+    html{background:#0f0f0f}
+    body{margin:0;background:#0f0f0f;color:#f1f1f1}
+    html.boot-loading,html.boot-loading body{overflow:hidden;height:100%}
+    #bootLoader{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;gap:20px;align-items:center;justify-content:center;background:#0f0f0f;transition:opacity .3s ease}
+    #bootLoader.hide{opacity:0;pointer-events:none}
+    #bootLoader .boot-brand{font:700 clamp(30px,7vw,46px)/1.2 Poppins,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;letter-spacing:.22em;text-indent:.22em;background:linear-gradient(to top,#fff 0%,#fff 50%,rgba(255,255,255,.12) 50%,rgba(255,255,255,.12) 100%);background-size:100% 240%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:bootFill 2.1s ease-in-out infinite}
+    @keyframes bootFill{0%{background-position:50% 0}45%{background-position:50% 100%}70%{background-position:50% 100%}100%{background-position:50% 0}}
+    #bootLoader .boot-tld{display:inline-block;vertical-align:bottom;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;margin-left:0;transform:translateX(-10px);background:linear-gradient(to top,#fff 0%,#fff 50%,rgba(255,255,255,.12) 50%,rgba(255,255,255,.12) 100%);background-size:100% 240%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:bootTldIn .28s ease .35s forwards}
+    @keyframes bootTldIn{to{max-width:3em;opacity:1;margin-left:.1em;transform:none}}
+  </style>
+  <noscript><style>#bootLoader{display:none}html.boot-loading,html.boot-loading body{overflow:visible;height:auto}</style></noscript>
   <link rel="stylesheet" href="../../styles.css" />
 </head>
 <body>
+  <div id="bootLoader" aria-hidden="true"><span class="boot-brand">LINISTITUL<span class="boot-tld">.ro</span></span></div>
   <a class="skip" href="#continut">Sari la conținut</a>
 
   <header class="topbar">
@@ -238,6 +251,32 @@
   </footer>
 
   <script>
+  (function(){
+    var t0 = Date.now();
+    var startHash = window.location.hash;
+    function hashTarget(){
+      if (!startHash || startHash.length < 2) return null;
+      try { return document.getElementById(decodeURIComponent(startHash.slice(1))); }
+      catch (e) { return null; }
+    }
+    function hide(){
+      var b = document.getElementById("bootLoader");
+      if (!b || b.dataset.done) return;
+      b.dataset.done = "1";
+      setTimeout(function(){
+        document.documentElement.classList.remove("boot-loading");
+        var t = hashTarget();
+        if (t) t.scrollIntoView();
+        else window.scrollTo(0, 0);
+        b.classList.add("hide");
+        setTimeout(function(){ b.remove(); }, 350);
+      }, Math.max(0, 1200 - (Date.now() - t0)));
+    }
+    try { history.scrollRestoration = "manual"; } catch (e) {}
+    if (!hashTarget()) window.scrollTo(0, 0);
+    document.addEventListener("DOMContentLoaded", function(){ setTimeout(hide, 600); });
+    setTimeout(hide, 3500);
+  })();
   document.querySelectorAll("a[data-email]").forEach((a) => {
     const d = (s) => s.split(",").map(Number).map((c) => String.fromCharCode(c)).join("");
     const addr = d(a.dataset.u) + "@" + d(a.dataset.d);
