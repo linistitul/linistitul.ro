@@ -226,7 +226,7 @@
             <a href="https://www.youtube.com/@linistitul" target="_blank" rel="noopener">YouTube</a>
             <a href="https://go.linistitul.ro/ig" target="_blank" rel="noopener">Instagram</a>
             <a href="https://go.linistitul.ro/fb" target="_blank" rel="noopener">Facebook</a>
-            <a href="mailto:hello@linistitul.ro">hello@linistitul.ro</a>
+            <a href="#" data-email data-u="104,101,105" data-d="108,105,110,105,115,116,105,116,117,108,46,114,111">email</a>
           </div>
         </div>
       </div>
@@ -237,6 +237,14 @@
     </div>
   </footer>
 
-  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+  <script>
+  document.querySelectorAll("a[data-email]").forEach((a) => {
+    const d = (s) => s.split(",").map(Number).map((c) => String.fromCharCode(c)).join("");
+    const addr = d(a.dataset.u) + "@" + d(a.dataset.d);
+    a.href = "mailto:" + addr;
+    a.textContent = addr;
+  });
+  document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>

@@ -39,6 +39,9 @@
   <link rel="apple-touch-icon" href="https://yt3.googleusercontent.com/ytc/AIdro_modnbNTuRlleNjTVouvkCrV_5UEVAxuMjbnRzZcO1hdq4=s180-c-k-c0x00ffffff-no-rj" />
   <link rel="preconnect" href="https://www.youtube-nocookie.com" />
   <link rel="preconnect" href="https://i.ytimg.com" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -67,12 +70,11 @@
   <main id="continut" class="wrap">
     <!-- HERO / LATEST -->
     <section id="nou" class="hero" aria-live="polite">
-      <div class="hero-head">
-        <span class="live-dot" aria-hidden="true"><span class="pulse"></span>CEL MAI NOU</span>
-      </div>
-
       <div class="hero-grid">
         <div class="player-card">
+          <div class="player-top">
+            <p class="kicker">Cel mai recent videoclip</p>
+          </div>
           <div class="player" id="playerWrap">
             <div class="skeleton-player" id="playerSkeleton" aria-hidden="true"></div>
             <iframe id="featuredPlayer"
@@ -82,14 +84,9 @@
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowfullscreen loading="eager"></iframe>
           </div>
-          <div class="player-bar">
-            <span id="feedStatus" class="feed-status" role="status">Se încarcă…</span>
-            <span id="feedTime" class="feed-time"></span>
-          </div>
         </div>
 
         <div class="hero-info">
-          <p class="kicker">Cel mai recent videoclip</p>
           <h1 id="videoTitle" class="video-title">Se încarcă cel mai nou videoclip…</h1>
           <p id="videoMeta" class="video-meta">LINISTITUL • @linistitul</p>
           <p id="videoDescription" class="video-desc">Se încarcă descrierea…</p>
@@ -143,7 +140,7 @@
             <a href="https://www.youtube.com/@linistitul" target="_blank" rel="noopener">YouTube</a>
             <a href="https://go.linistitul.ro/ig" target="_blank" rel="noopener">Instagram</a>
             <a href="https://go.linistitul.ro/fb" target="_blank" rel="noopener">Facebook</a>
-            <a href="mailto:hello@linistitul.ro">hello@linistitul.ro</a>
+            <a href="#" data-email data-u="104,101,105" data-d="108,105,110,105,115,116,105,116,117,108,46,114,111">email</a>
           </div>
         </div>
       </div>

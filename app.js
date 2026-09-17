@@ -157,16 +157,6 @@ async function fetchLatestVideos() {
 
 /* ---------- Rendering ---------- */
 
-function setStatus(mode, text) {
-  const el = $("feedStatus");
-  el.textContent = text;
-  el.classList.toggle("live", mode === "live");
-  el.classList.toggle("cache", mode === "cache");
-  $("feedTime").textContent = mode === "live"
-    ? new Date().toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" })
-    : "";
-}
-
 function setDescription(text) {
   const el = $("videoDescription");
   const clean = String(text || "").slice(0, 320);
@@ -257,6 +247,13 @@ function closeShare() {
 async function boot(refresh = false) {
   if (!refresh) {
     $("year").textContent = new Date().getFullYear();
+    // Asamblează adresa de email din coduri (anti-scrapere): nu există în clar în HTML.
+    document.querySelectorAll("a[data-email]").forEach((a) => {
+      const d = (s) => s.split(",").map(Number).map((c) => String.fromCharCode(c)).join("");
+      const addr = `${d(a.dataset.u)}@${d(a.dataset.d)}`;
+      a.href = `mailto:${addr}`;
+      a.textContent = addr;
+    });
     $("shareBtn").addEventListener("click", openShare);
     $("shareClose").addEventListener("click", closeShare);
     $("shareOverlay").addEventListener("click", (e) => { if (e.target === $("shareOverlay")) closeShare(); });
@@ -272,7 +269,6 @@ async function boot(refresh = false) {
     const { videos } = await fetchLatestVideos();
     renderFeatured(videos[0]);
     renderGrid(videos);
-    setStatus("live", "Actualizat acum");
   } catch (err) {
     console.warn("Feed live indisponibil, folosesc fallback:", err);
     renderGrid(FALLBACK_VIDEOS);
@@ -281,7 +277,6 @@ async function boot(refresh = false) {
       $("watchBtn").href = videoUrl(FALLBACK_VIDEOS[0].id);
       setDescription("");
     }
-    setStatus("cache", "Afișare offline");
   }
 }
 
