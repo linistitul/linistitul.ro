@@ -58,17 +58,6 @@
 </head>
 <body>
   <div id="bootLoader" aria-hidden="true"><span class="boot-brand">LINISTITUL<span class="boot-tld">.ro</span></span></div>
-  <script>
-  try {
-    if (sessionStorage.getItem("linistitul_booted")) {
-      var _bl = document.getElementById("bootLoader");
-      if (_bl) _bl.remove();
-      document.documentElement.classList.remove("boot-loading");
-    } else {
-      sessionStorage.setItem("linistitul_booted", "1");
-    }
-  } catch (e) {}
-  </script>
   <a class="skip" href="#continut" data-i18n="skip">Sari la conținut</a>
 
   <header class="topbar">
@@ -184,9 +173,6 @@
     </div>
   </footer>
 
-  <div id="langLoader" class="loader-overlay" hidden aria-hidden="true">
-    <span class="loader-spinner"></span>
-  </div>
   <div id="shareOverlay" class="share-overlay" hidden>
     <div class="share-dialog" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
       <div class="share-head">

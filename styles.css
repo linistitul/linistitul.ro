@@ -79,22 +79,6 @@ body {
 .lang-option:hover { background: var(--bg-hover); }
 .lang-option .check { opacity: 0; flex: none; }
 .lang-option[aria-checked="true"] .check { opacity: 1; }
-/* Loader de limbă, stil YouTube */
-.loader-overlay {
-  position: fixed; inset: 0; z-index: 80;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(10,10,10,.55);
-  opacity: 0; transition: opacity .18s ease;
-}
-.loader-overlay[hidden] { display: none; }
-.loader-overlay.show { opacity: 1; }
-.loader-spinner {
-  width: 44px; height: 44px; border-radius: 50%;
-  border: 3px solid rgba(255,255,255,.18); border-top-color: #fff;
-  animation: spin .8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
 /* Buttons */
 .btn {
   display: inline-flex; align-items: center; gap: 8px;

@@ -57,17 +57,6 @@
 </head>
 <body>
   <div id="bootLoader" aria-hidden="true"><span class="boot-brand">LINISTITUL<span class="boot-tld">.ro</span></span></div>
-  <script>
-  try {
-    if (sessionStorage.getItem("linistitul_booted")) {
-      var _bl = document.getElementById("bootLoader");
-      if (_bl) _bl.remove();
-      document.documentElement.classList.remove("boot-loading");
-    } else {
-      sessionStorage.setItem("linistitul_booted", "1");
-    }
-  } catch (e) {}
-  </script>
   <a class="skip" href="#continut">Sari la conținut</a>
 
   <header class="topbar">
@@ -153,50 +142,47 @@
 
   <script>
   (function(){
-    function bootFromCache(){
-      try {
-        var nav = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
-        if (!nav || typeof nav.transferSize !== "number" || nav.transferSize !== 0) return false;
-        var probe = document.querySelector(".wrap");
-        if (!probe || getComputedStyle(probe).maxWidth !== "1180px") return false;
-        var crit = ["styles.css", "fonts.googleapis.com"];
-        var res = performance.getEntriesByType("resource") || [];
-        return crit.every(function(c){
-          var hit = res.filter(function(r){ return (r.name || "").indexOf(c) !== -1; });
-          return hit.length > 0 && hit.every(function(r){ return r.transferSize === 0; });
-        });
-      } catch (e) { return false; }
-    }
-    if (bootFromCache()) {
-      var bb = document.getElementById("bootLoader");
-      if (bb) bb.remove();
-      document.documentElement.classList.remove("boot-loading");
-      window.scrollTo(0, 0);
-    }
-    var t0 = Date.now();
+    var bootT0 = Date.now();
     var startHash = window.location.hash;
     function hashTarget(){
       if (!startHash || startHash.length < 2) return null;
       try { return document.getElementById(decodeURIComponent(startHash.slice(1))); }
       catch (e) { return null; }
     }
-    function hide(){
+    function pageReady(){
+      try {
+        var probe = document.querySelector(".wrap");
+        if (!probe || getComputedStyle(probe).maxWidth !== "1180px") return false;
+        var imgs = document.images || [];
+        for (var i = 0; i < imgs.length; i++) {
+          if (!imgs[i].complete || imgs[i].naturalWidth === 0) return false;
+        }
+        return true;
+      } catch (e) { return false; }
+    }
+    function hide(instant){
       var b = document.getElementById("bootLoader");
       if (!b || b.dataset.done) return;
       b.dataset.done = "1";
-      setTimeout(function(){
+      var done = function(){
         document.documentElement.classList.remove("boot-loading");
         var t = hashTarget();
         if (t) t.scrollIntoView();
         else window.scrollTo(0, 0);
-        b.classList.add("hide");
-        setTimeout(function(){ b.remove(); }, 350);
-      }, Math.max(0, 1200 - (Date.now() - t0)));
+        if (instant) b.remove();
+        else { b.classList.add("hide"); setTimeout(function(){ b.remove(); }, 350); }
+      };
+      if (instant) done();
+      else setTimeout(done, Math.max(0, 1200 - (Date.now() - bootT0)));
+    }
+    function pollBoot(){
+      if (pageReady()) hide(Date.now() - bootT0 < 300);
+      else setTimeout(pollBoot, 80);
     }
     try { history.scrollRestoration = "manual"; } catch (e) {}
     if (!hashTarget()) window.scrollTo(0, 0);
-    document.addEventListener("DOMContentLoaded", function(){ setTimeout(hide, 600); });
-    setTimeout(hide, 3500);
+    pollBoot();
+    setTimeout(function(){ hide(false); }, 6000);
   })();
   document.querySelectorAll("a[data-email]").forEach((a) => {
     const d = (s) => s.split(",").map(Number).map((c) => String.fromCharCode(c)).join("");

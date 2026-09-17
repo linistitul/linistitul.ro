@@ -305,16 +305,22 @@ function closeShare() {
   if (lastFocus) lastFocus.focus();
 }
 
-function showLoader() {
-  const o = $("langLoader");
-  o.hidden = false;
-  requestAnimationFrame(() => requestAnimationFrame(() => o.classList.add("show")));
+function ensureBootLoader() {
+  let b = document.getElementById("bootLoader");
+  if (!b) {
+    b = document.createElement("div");
+    b.id = "bootLoader";
+    b.setAttribute("aria-hidden", "true");
+    b.innerHTML = '<span class="boot-brand">LINISTITUL<span class="boot-tld">.ro</span></span>';
+    document.body.prepend(b);
+    document.documentElement.classList.add("boot-loading");
+  }
+  delete b.dataset.done;
+  b.classList.remove("hide");
+  return b;
 }
-function hideLoader() {
-  const o = $("langLoader");
-  o.classList.remove("show");
-  setTimeout(() => { o.hidden = true; }, 200);
-}
+function showLoader() { ensureBootLoader(); }
+function hideLoader() { hideBootLoader(false); }
 function updateLangMenu() {
   document.querySelectorAll(".lang-option").forEach((b) => {
     b.setAttribute("aria-checked", String(b.dataset.lang === LANG));
@@ -388,6 +394,20 @@ async function renderVideos(videos) {
   const vids = LANG === "en" ? await withTranslations(videos) : videos;
   renderFeatured(vids[0]);
   renderGrid(vids);
+  // Conținutul dinamic e "gata" abia după ce s-au decodat și thumbnailurile.
+  if (!window.__contentReady) {
+    try {
+      await Promise.race([
+        Promise.all(
+          [...document.querySelectorAll("#videosGrid img")].map((img) =>
+            (img.decode ? img.decode() : Promise.resolve()).catch(() => {})
+          )
+        ),
+        new Promise((res) => setTimeout(res, 4000)),
+      ]);
+    } catch {}
+    window.__contentReady = true;
+  }
 }
 
 async function boot(refresh = false) {
@@ -493,27 +513,10 @@ async function refreshAvatar() {
   }
 }
 
-/* ---------- Loader inițial anti-FOUC (ascunde prima pictare nestilizată) ---------- */
-function bootFromCache() {
-  try {
-    var nav = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
-    if (!nav || typeof nav.transferSize !== "number" || nav.transferSize !== 0) return false;
-    // dovadă directă că CSS-ul extern e aplicat (altfel ar fi fals pozitiv pe rețea lentă)
-    var probe = document.querySelector(".wrap");
-    if (!probe || getComputedStyle(probe).maxWidth !== "1180px") return false;
-    var crit = ["styles.css", "app.js", "fonts.googleapis.com"];
-    var res = performance.getEntriesByType("resource") || [];
-    return crit.every(function (c) {
-      var hit = res.filter(function (r) { return (r.name || "").indexOf(c) !== -1; });
-      return hit.length > 0 && hit.every(function (r) { return r.transferSize === 0; });
-    });
-  } catch (e) { return false; }
-}
-if (bootFromCache()) {
-  const bb = document.getElementById("bootLoader");
-  if (bb) bb.remove();
-  document.documentElement.classList.remove("boot-loading");
-}
+/* ---------- Loader: se ascunde doar când pagina e completă ----------
+ * Regula: CSS aplicat + TOATE imaginile din DOM decodate + cardurile video
+ * randate (inclusiv thumbnailurile lor). Dacă totul e gata în <300ms,
+ * loaderul dispare instant; altfel, minim 1200ms + fade. Cap 6s. */
 const bootT0 = Date.now();
 const startHash = window.location.hash;
 function hashTarget() {
@@ -521,25 +524,40 @@ function hashTarget() {
   try { return document.getElementById(decodeURIComponent(startHash.slice(1))); }
   catch { return null; }
 }
+function pageReady() {
+  try {
+    const probe = document.querySelector(".wrap");
+    if (!probe || getComputedStyle(probe).maxWidth !== "1180px") return false;
+    const imgs = document.images || [];
+    for (let i = 0; i < imgs.length; i++) {
+      if (!imgs[i].complete || imgs[i].naturalWidth === 0) return false;
+    }
+    return window.__contentReady === true;
+  } catch { return false; }
+}
 try { history.scrollRestoration = "manual"; } catch {}
 if (!hashTarget()) window.scrollTo(0, 0);
-function hideBootLoader() {
+function hideBootLoader(instant) {
   const b = document.getElementById("bootLoader");
   if (!b || b.dataset.done) return;
   b.dataset.done = "1";
-  setTimeout(() => {
+  const done = () => {
     document.documentElement.classList.remove("boot-loading");
     const t = hashTarget();
     if (t) t.scrollIntoView();
     else window.scrollTo(0, 0);
-    b.classList.add("hide");
-    setTimeout(() => b.remove(), 350);
-  }, Math.max(0, 1200 - (Date.now() - bootT0)));
+    if (instant) b.remove();
+    else { b.classList.add("hide"); setTimeout(() => b.remove(), 350); }
+  };
+  if (instant) done();
+  else setTimeout(done, Math.max(0, 1200 - (Date.now() - bootT0)));
 }
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => setTimeout(hideBootLoader, 300));
-if (document.fonts && document.fonts.load) document.fonts.load('700 15px "Poppins"').then(() => setTimeout(hideBootLoader, 200), () => setTimeout(hideBootLoader, 200));
-document.addEventListener("DOMContentLoaded", () => setTimeout(hideBootLoader, 600));
-setTimeout(hideBootLoader, 3500); // cap absolut: nu blochează pagina niciodată
+function pollBoot() {
+  if (pageReady()) hideBootLoader(Date.now() - bootT0 < 300);
+  else setTimeout(pollBoot, 80);
+}
+pollBoot();
+setTimeout(() => hideBootLoader(false), 6000); // cap absolut: nu blochează pagina niciodată
 
 document.addEventListener("DOMContentLoaded", () => {
   refreshAvatar(); // sincron aplică poza memorată local, dacă există
