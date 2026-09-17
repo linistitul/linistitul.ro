@@ -493,6 +493,26 @@ async function refreshAvatar() {
   }
 }
 
+/* ---------- Loader inițial anti-FOUC (ascunde prima pictare nestilizată) ---------- */
+const bootT0 = Date.now();
+try { history.scrollRestoration = "manual"; } catch {}
+window.scrollTo(0, 0);
+function hideBootLoader() {
+  const b = document.getElementById("bootLoader");
+  if (!b || b.dataset.done) return;
+  b.dataset.done = "1";
+  setTimeout(() => {
+    document.documentElement.classList.remove("boot-loading");
+    window.scrollTo(0, 0);
+    b.classList.add("hide");
+    setTimeout(() => b.remove(), 350);
+  }, Math.max(0, 1200 - (Date.now() - bootT0)));
+}
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => setTimeout(hideBootLoader, 300));
+if (document.fonts && document.fonts.load) document.fonts.load('700 15px "Poppins"').then(() => setTimeout(hideBootLoader, 200), () => setTimeout(hideBootLoader, 200));
+document.addEventListener("DOMContentLoaded", () => setTimeout(hideBootLoader, 600));
+setTimeout(hideBootLoader, 3500); // cap absolut: nu blochează pagina niciodată
+
 document.addEventListener("DOMContentLoaded", () => {
   refreshAvatar(); // sincron aplică poza memorată local, dacă există
   boot(false);
