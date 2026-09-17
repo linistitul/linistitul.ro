@@ -31,16 +31,56 @@ const FALLBACK_VIDEOS = [
 
 const $ = (id) => document.getElementById(id);
 
+/* ---------- Bilingv RO/EN (doar pagina principală; blogul rămâne în română) ---------- */
+const I18N = {
+  ro: {
+    skip: "Sari la conținut", navVideos: "Videoclipuri", subscribe: "Abonează-te",
+    kicker: "Cel mai recent videoclip", loadingTitle: "Se încarcă cel mai nou videoclip…",
+    loadingDesc: "Se încarcă descrierea…", watch: "Vezi pe YouTube", shareAria: "Distribuie",
+    latestH2: "Ultimele videoclipuri", allVideos: "Toate videoclipurile",
+    shareTitle: "Distribuie", closeAria: "Închide fereastra", copyLink: "Copiază linkul",
+    copiedOk: "Link copiat ✓", copiedFail: "Copierea a eșuat",
+    fdesc1: "Creator de conținut. Eu zic că e fain și merită să arunci un ochi.",
+    fdesc2: "Serii cinematice „Un minut în…”, vloguri și proiecte creative.",
+    umbrellaPre: "LINISTITUL este un brand ", umbrellaPost: ".",
+    brandAria: "LINISTITUL — pagina principală",
+    langMenu: "Alege limba",
+    baseTitle: "LINISTITUL — Cele mai noi videoclipuri",
+    openYT: "deschide pe YouTube", viewsWord: "vizionări", badge: "CEL MAI NOU",
+  },
+  en: {
+    skip: "Skip to content", navVideos: "Videos", subscribe: "Subscribe",
+    kicker: "Latest video", loadingTitle: "Loading the latest video…",
+    loadingDesc: "Loading description…", watch: "Watch on YouTube", shareAria: "Share",
+    latestH2: "Latest videos", allVideos: "All videos",
+    shareTitle: "Share", closeAria: "Close dialog", copyLink: "Copy link",
+    copiedOk: "Link copied ✓", copiedFail: "Copy failed",
+    fdesc1: "Content creator. It might be cool and worth taking a look.",
+    fdesc2: "Cinematic “One minute in…” series, vlogs and creative projects.",
+    umbrellaPre: "LINISTITUL is an ", umbrellaPost: " brand.",
+    brandAria: "LINISTITUL — homepage",
+    langMenu: "Choose language",
+    baseTitle: "LINISTITUL — Latest videos",
+    openYT: "open on YouTube", viewsWord: "views", badge: "LATEST",
+  },
+};
+let LANG = "ro";
+try { if (localStorage.getItem("linistitul_lang") === "en") LANG = "en"; } catch {}
+let lastVideos = null;
+const T = (k) => I18N[LANG][k] ?? I18N.ro[k] ?? "";
+function applyLang() {
+  document.documentElement.lang = LANG;
+  document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = T(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-aria]").forEach((el) => { el.setAttribute("aria-label", T(el.dataset.i18nAria)); });
+  const lb = $("langBtn");
+  if (lb) { lb.setAttribute("aria-label", T("langMenu")); lb.title = T("langMenu"); }
+  if (!lastVideos) document.title = T("baseTitle");
+}
+
 function escapeHtml(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
   }[c]));
-}
-
-function formatDateRO(iso) {
-  try {
-    return new Intl.DateTimeFormat("ro-RO", { day: "numeric", month: "long", year: "numeric" }).format(new Date(iso));
-  } catch { return ""; }
 }
 
 function timeAgoRO(iso) {
@@ -58,6 +98,27 @@ function timeAgoRO(iso) {
   const years = Math.floor(months / 12);
   return years === 1 ? "acum 1 an" : `acum ${years} ani`;
 }
+function timeAgoEN(iso) {
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return "";
+  const mins = Math.max(1, Math.floor((Date.now() - then) / 60000));
+  if (mins < 60) return mins === 1 ? "1 minute ago" : `${mins} minutes ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return "yesterday";
+  if (days < 30) return `${days} days ago`;
+  const months = Math.floor(days / 30);
+  if (months < 12) return months === 1 ? "1 month ago" : `${months} months ago`;
+  const y = Math.floor(months / 12);
+  return y === 1 ? "1 year ago" : `${y} years ago`;
+}
+function formatDate(iso) {
+  try {
+    return new Intl.DateTimeFormat(LANG === "ro" ? "ro-RO" : "en-US", { day: "numeric", month: "long", year: "numeric" }).format(new Date(iso));
+  } catch { return ""; }
+}
+const timeAgo = (iso) => (LANG === "ro" ? timeAgoRO(iso) : timeAgoEN(iso));
 
 function videoUrl(id) { return `https://www.youtube.com/watch?v=${id}`; }
 function thumbUrl(id) { return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`; }
@@ -171,8 +232,8 @@ function renderFeatured(v) {
   player.title = v.title;
   $("videoTitle").textContent = v.title;
   const bits = [`LINISTITUL • ${CHANNEL_HANDLE}`];
-  if (v.published) bits.push(`${formatDateRO(v.published)} • ${timeAgoRO(v.published)}`);
-  if (v.views) bits.push(`${v.views.toLocaleString("ro-RO")} vizionări`);
+  if (v.published) bits.push(`${formatDate(v.published)} • ${timeAgo(v.published)}`);
+  if (v.views) bits.push(`${v.views.toLocaleString(LANG === "ro" ? "ro-RO" : "en-US")} ${T("viewsWord")}`);
   $("videoMeta").textContent = bits.join("  •  ");
   setDescription(v.description);
   const watch = $("watchBtn");
@@ -189,19 +250,19 @@ function renderGrid(videos) {
     a.href = videoUrl(v.id);
     a.target = "_blank";
     a.rel = "noopener";
-    a.setAttribute("aria-label", `${v.title} — deschide pe YouTube`);
+    a.setAttribute("aria-label", `${v.title} — ${T("openYT")}`);
     a.innerHTML = `
       <span class="thumb">
         <img src="https://i.ytimg.com/vi/${v.id}/hq720.jpg" onerror="this.onerror=null;this.src='${thumbUrl(v.id)}'" alt="" loading="${i < 3 ? "eager" : "lazy"}" width="480" height="270" />
         <span class="play" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26"><path fill="currentColor" d="M8 5v14l11-7z"/></svg></span>
-        ${i === 0 ? '<span class="badge-new">CEL MAI NOU</span>' : ""}
-        <span class="watch-pill" aria-hidden="true">Vezi pe YouTube</span>
+        ${i === 0 ? '<span class="badge-new">' + T("badge") + "</span>" : ""}
+        <span class="watch-pill" aria-hidden="true">${T("watch")}</span>
       </span>
       <span class="card-body">
         <img class="card-avatar" src="${AVATAR_88}" alt="" loading="lazy" width="34" height="34" />
         <span>
           <h3>${escapeHtml(v.title)}</h3>
-          <p>LINISTITUL${v.published ? ` • ${escapeHtml(timeAgoRO(v.published))}` : ""}</p>
+          <p>LINISTITUL${v.published ? ` • ${escapeHtml(timeAgo(v.published))}` : ""}</p>
         </span>
       </span>`;
     grid.appendChild(a);
@@ -231,7 +292,7 @@ function openShare() {
   $("shareWa").href = `https://wa.me/?text=${t}%20${u}`;
   $("shareMail").href = `mailto:?subject=${t}&body=${u}`;
   const label = $("copyLabel");
-  label.textContent = "Copiază linkul";
+  label.textContent = T("copyLink");
   label.classList.remove("copied");
   lastFocus = document.activeElement;
   $("shareOverlay").hidden = false;
@@ -244,6 +305,91 @@ function closeShare() {
   if (lastFocus) lastFocus.focus();
 }
 
+function showLoader() {
+  const o = $("langLoader");
+  o.hidden = false;
+  requestAnimationFrame(() => requestAnimationFrame(() => o.classList.add("show")));
+}
+function hideLoader() {
+  const o = $("langLoader");
+  o.classList.remove("show");
+  setTimeout(() => { o.hidden = true; }, 200);
+}
+function updateLangMenu() {
+  document.querySelectorAll(".lang-option").forEach((b) => {
+    b.setAttribute("aria-checked", String(b.dataset.lang === LANG));
+  });
+}
+function openLangMenu() {
+  const m = $("langMenu"), b = $("langBtn");
+  const r = b.getBoundingClientRect();
+  m.style.top = `${Math.min(r.bottom + 8, window.innerHeight - 140)}px`;
+  m.style.left = `${Math.max(8, Math.min(r.left, window.innerWidth - 180))}px`;
+  m.hidden = false;
+  b.setAttribute("aria-expanded", "true");
+  updateLangMenu();
+  m.querySelector(".lang-option")?.focus();
+}
+function closeLangMenu(focusBack = false) {
+  $("langMenu").hidden = true;
+  $("langBtn").setAttribute("aria-expanded", "false");
+  if (focusBack) $("langBtn").focus();
+}
+function setLang(l) {
+  if (l === LANG) { closeLangMenu(true); return; }
+  closeLangMenu();
+  showLoader(); // maschează reașezarea textelor în noua limbă
+  setTimeout(async () => {
+    LANG = l;
+    try { localStorage.setItem("linistitul_lang", LANG); } catch {}
+    applyLang();
+    if (lastVideos) await renderVideos(lastVideos);
+    hideLoader();
+  }, 550);
+}
+
+/* ---------- Traducere automată RO→EN (cache local, cu fallback) ----------
+ * Feed-ul YouTube nu conține traducerile (doar titlul original), iar API-ul
+ * oficial ar cere cheie expusă → traducem local, o singură dată per videoclip,
+ * și memorăm rezultatul în browser. La orice eșec se arată textul original. */
+const TR_CACHE_PREFIX = "linistitul_tr_en_";
+function trCacheGet(id) {
+  try { return JSON.parse(localStorage.getItem(TR_CACHE_PREFIX + id)); }
+  catch { return null; }
+}
+function trCacheSet(id, obj) {
+  try { localStorage.setItem(TR_CACHE_PREFIX + id, JSON.stringify(obj)); } catch {}
+}
+async function translateOne(text) {
+  const q = String(text || "").trim().slice(0, 480);
+  if (!q) return "";
+  const res = await fetchWithTimeout(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(q)}&langpair=ro|en`, 8000);
+  const out = (await res.json())?.responseData?.translatedText || "";
+  if (!out || /MYMEMORY WARNING/i.test(out)) throw new Error("traducere indisponibilă");
+  return out;
+}
+async function withTranslations(videos) {
+  const jobs = videos.map(async (v) => {
+    const cached = trCacheGet(v.id);
+    if (cached && cached.s === (v.title || "") && cached.sd === (v.description || "")) {
+      return { ...v, title: cached.t, description: cached.d };
+    }
+    const [t, d] = await Promise.all([
+      translateOne(v.title).catch(() => v.title || ""),
+      translateOne(v.description).catch(() => v.description || ""),
+    ]);
+    trCacheSet(v.id, { s: v.title || "", t, sd: v.description || "", d });
+    return { ...v, title: t, description: d };
+  });
+  const timeout = new Promise((res) => setTimeout(() => res(videos), 7000));
+  return Promise.race([Promise.all(jobs), timeout]);
+}
+async function renderVideos(videos) {
+  const vids = LANG === "en" ? await withTranslations(videos) : videos;
+  renderFeatured(vids[0]);
+  renderGrid(vids);
+}
+
 async function boot(refresh = false) {
   if (!refresh) {
     $("year").textContent = new Date().getFullYear();
@@ -254,6 +400,22 @@ async function boot(refresh = false) {
       a.href = `mailto:${addr}`;
       a.textContent = addr;
     });
+    applyLang();
+    updateLangMenu();
+    $("langBtn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      $("langMenu").hidden ? openLangMenu() : closeLangMenu();
+    });
+    document.querySelectorAll(".lang-option").forEach((b) => {
+      b.addEventListener("click", () => setLang(b.dataset.lang));
+    });
+    document.addEventListener("click", (e) => {
+      if (!$("langMenu").hidden && !e.target.closest(".lang-wrap")) closeLangMenu();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !$("langMenu").hidden) closeLangMenu(true);
+    });
+    window.addEventListener("resize", () => { if (!$("langMenu").hidden) closeLangMenu(); });
     $("shareBtn").addEventListener("click", openShare);
     $("shareClose").addEventListener("click", closeShare);
     $("shareOverlay").addEventListener("click", (e) => { if (e.target === $("shareOverlay")) closeShare(); });
@@ -261,17 +423,18 @@ async function boot(refresh = false) {
     $("copyLinkBtn").addEventListener("click", async () => {
       const ok = await copyText($("watchBtn").href);
       const label = $("copyLabel");
-      label.textContent = ok ? "Link copiat ✓" : "Copierea a eșuat";
+      label.textContent = ok ? T("copiedOk") : T("copiedFail");
       label.classList.toggle("copied", ok);
     });
   }
   try {
     const { videos } = await fetchLatestVideos();
-    renderFeatured(videos[0]);
-    renderGrid(videos);
+    lastVideos = videos;
+    await renderVideos(videos);
   } catch (err) {
     console.warn("Feed live indisponibil, folosesc fallback:", err);
-    renderGrid(FALLBACK_VIDEOS);
+    lastVideos = FALLBACK_VIDEOS;
+    await renderVideos(FALLBACK_VIDEOS);
     if (!refresh) {
       $("videoTitle").textContent = FALLBACK_VIDEOS[0].title;
       $("watchBtn").href = videoUrl(FALLBACK_VIDEOS[0].id);

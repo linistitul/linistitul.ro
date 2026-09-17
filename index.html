@@ -41,15 +41,15 @@
   <link rel="preconnect" href="https://i.ytimg.com" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Poppins:wght@700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <a class="skip" href="#continut">Sari la conținut</a>
+  <a class="skip" href="#continut" data-i18n="skip">Sari la conținut</a>
 
   <header class="topbar">
     <div class="wrap topbar-inner">
-      <a class="brand" href="/" aria-label="LINISTITUL — pagina principală">
+      <a class="brand" href="/" data-i18n-aria="brandAria" aria-label="LINISTITUL — pagina principală">
         <img class="brand-avatar" data-avatar="88" src="https://yt3.googleusercontent.com/ytc/AIdro_modnbNTuRlleNjTVouvkCrV_5UEVAxuMjbnRzZcO1hdq4=s88-c-k-c0x00ffffff-no-rj" alt="Sigla canalului LINISTITUL" width="36" height="36" />
         <span class="brand-text">
           <span class="brand-name">LINISTITUL</span>
@@ -57,12 +57,21 @@
         </span>
       </a>
       <nav class="nav" aria-label="Navigare principală">
-        <a href="#videoclipuri" class="nav-link">Videoclipuri</a>
+        <div class="lang-wrap">
+          <button id="langBtn" class="lang-btn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Alege limba" title="Alege limba">
+            <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
+          </button>
+          <div id="langMenu" class="lang-menu" role="menu" aria-label="Limbă / Language" hidden>
+            <button type="button" class="lang-option" role="menuitemradio" aria-checked="true" data-lang="ro"><span>Română</span><svg class="check" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M9.5 16.2 5.3 12l-1.4 1.4 5.6 5.6 12-12L20.1 5.6 9.5 16.2Z"/></svg></button>
+            <button type="button" class="lang-option" role="menuitemradio" aria-checked="false" data-lang="en"><span>English</span><svg class="check" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M9.5 16.2 5.3 12l-1.4 1.4 5.6 5.6 12-12L20.1 5.6 9.5 16.2Z"/></svg></button>
+          </div>
+        </div>
+        <a href="#videoclipuri" class="nav-link" data-i18n="navVideos">Videoclipuri</a>
         <a href="/blog" class="nav-link">Blog</a>
       </nav>
       <a class="btn btn-sub" href="https://go.linistitul.ro/sub" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M23 7.2s-.2-1.6-.9-2.3c-.9-.9-1.9-.9-2.3-1C16.6 3.5 12 3.5 12 3.5s-4.6 0-7.8.4c-.4.1-1.4.1-2.3 1-.7.7-.9 2.3-.9 2.3S.8 9.1.8 11v1.8c0 1.9.2 3.8.2 3.8s.2 1.6.9 2.3c.9.9 2 .9 2.5 1 1.8.2 7.6.4 7.6.4s4.6 0 7.8-.4c.4-.1 1.4-.1 2.3-1 .7-.7.9-2.3.9-2.3s.2-1.9.2-3.8V11c0-1.9-.2-3.8-.2-3.8ZM9.7 15.1V8.7l6.2 3.2-6.2 3.2Z"/></svg>
-        Abonează-te
+        <span data-i18n="subscribe">Abonează-te</span>
       </a>
     </div>
   </header>
@@ -73,7 +82,7 @@
       <div class="hero-grid">
         <div class="player-card">
           <div class="player-top">
-            <p class="kicker">Cel mai recent videoclip</p>
+            <p class="kicker" data-i18n="kicker">Cel mai recent videoclip</p>
           </div>
           <div class="player" id="playerWrap">
             <div class="skeleton-player" id="playerSkeleton" aria-hidden="true"></div>
@@ -87,15 +96,15 @@
         </div>
 
         <div class="hero-info">
-          <h1 id="videoTitle" class="video-title">Se încarcă cel mai nou videoclip…</h1>
+          <h1 id="videoTitle" class="video-title" data-i18n="loadingTitle">Se încarcă cel mai nou videoclip…</h1>
           <p id="videoMeta" class="video-meta">LINISTITUL • @linistitul</p>
-          <p id="videoDescription" class="video-desc">Se încarcă descrierea…</p>
+          <p id="videoDescription" class="video-desc" data-i18n="loadingDesc">Se încarcă descrierea…</p>
           <div class="hero-actions">
             <a id="watchBtn" class="btn btn-watch" href="https://www.youtube.com/@linistitul" target="_blank" rel="noopener">
               <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
-              Vezi pe YouTube
+              <span data-i18n="watch">Vezi pe YouTube</span>
             </a>
-            <button id="shareBtn" class="btn-share-icon" type="button" aria-haspopup="dialog" aria-label="Distribuie">
+            <button id="shareBtn" class="btn-share-icon" type="button" aria-haspopup="dialog" data-i18n-aria="shareAria" aria-label="Distribuie">
               <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M14 4l8 8-8 8v-5c-5 0-8.5 1.6-10.5 5 .5-6 3.5-10.5 10.5-11V4Z"/></svg>
             </button>
           </div>
@@ -106,7 +115,7 @@
     <!-- GRID -->
     <section id="videoclipuri" class="section">
       <div class="section-head">
-        <h2>Ultimele videoclipuri</h2>
+        <h2 data-i18n="latestH2">Ultimele videoclipuri</h2>
       </div>
       <div id="videosGrid" class="grid" aria-live="polite">
         <article class="card skeleton-card" aria-hidden="true"><div class="thumb skeleton"></div><div class="line skeleton"></div><div class="line short skeleton"></div></article>
@@ -115,7 +124,7 @@
       </div>
       <div class="more-wrap">
         <a class="btn btn-more" href="https://go.linistitul.ro/watch" target="_blank" rel="noopener">
-          <span class="more-text">Toate videoclipurile</span>
+          <span class="more-text" data-i18n="allVideos">Toate videoclipurile</span>
           <span class="more-arrow" aria-hidden="true">→</span>
         </a>
       </div>
@@ -134,8 +143,8 @@
         <img class="about-avatar" data-avatar="176" src="https://yt3.googleusercontent.com/ytc/AIdro_modnbNTuRlleNjTVouvkCrV_5UEVAxuMjbnRzZcO1hdq4=s176-c-k-c0x00ffffff-no-rj" alt="LINISTITUL" width="72" height="72" loading="lazy" />
         <div>
           <p class="footer-brand">LINISTITUL</p>
-          <p class="footer-desc">Creator de conținut. Eu zic că e fain și merită să arunci un ochi.</p>
-          <p class="footer-desc">Serii cinematice „Un minut în…”, vloguri și proiecte creative.</p>
+          <p class="footer-desc" data-i18n="fdesc1">Creator de conținut. Eu zic că e fain și merită să arunci un ochi.</p>
+          <p class="footer-desc" data-i18n="fdesc2">Serii cinematice „Un minut în…”, vloguri și proiecte creative.</p>
           <div class="about-links">
             <a href="https://www.youtube.com/@linistitul" target="_blank" rel="noopener">YouTube</a>
             <a href="https://go.linistitul.ro/ig" target="_blank" rel="noopener">Instagram</a>
@@ -146,16 +155,19 @@
       </div>
       <div class="footer-inner">
         <span>© <span id="year">2026</span> INOCULENS • linistitul.ro</span>
-        <span class="footer-umbrella">LINISTITUL este un brand <a href="https://inoculens.com" target="_blank" rel="noopener">INOCULENS</a>.</span>
+        <span class="footer-umbrella"><span data-i18n="umbrellaPre">LINISTITUL este un brand </span><a href="https://inoculens.com" target="_blank" rel="noopener">INOCULENS</a><span data-i18n="umbrellaPost">.</span></span>
       </div>
     </div>
   </footer>
 
+  <div id="langLoader" class="loader-overlay" hidden aria-hidden="true">
+    <span class="loader-spinner"></span>
+  </div>
   <div id="shareOverlay" class="share-overlay" hidden>
     <div class="share-dialog" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
       <div class="share-head">
-        <h2 id="shareTitle">Distribuie</h2>
-        <button id="shareClose" class="icon-btn" type="button" aria-label="Închide fereastra">
+        <h2 id="shareTitle" data-i18n="shareTitle">Distribuie</h2>
+        <button id="shareClose" class="icon-btn" type="button" data-i18n-aria="closeAria" aria-label="Închide fereastra">
           <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12 19 6.4 17.6 5 12 10.6 6.4 5Z"/></svg>
         </button>
       </div>
@@ -163,7 +175,7 @@
       <div class="share-options">
         <button class="share-option" id="copyLinkBtn" type="button">
           <span class="share-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.7-1.7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-          <span id="copyLabel">Copiază linkul</span>
+          <span id="copyLabel" data-i18n="copyLink">Copiază linkul</span>
         </button>
         <a class="share-option" id="shareX" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener">
           <span class="share-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M17.7 3H21l-7.3 8.3L22.2 21h-6.7l-5.2-6.3L4.3 21H1l7.8-8.9L1.8 3h6.9l4.7 5.7L17.7 3Zm-1.2 16h1.9L7.1 4.9H5L16.5 19Z"/></svg></span>
