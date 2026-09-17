@@ -218,18 +218,54 @@ function renderGrid(videos) {
   });
 }
 
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); return true; }
+  catch {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand("copy"); ta.remove(); return ok;
+    } catch { return false; }
+  }
+}
+
+let lastFocus = null;
+function openShare() {
+  const url = $("watchBtn").href;
+  const title = $("videoTitle").textContent || "LINISTITUL";
+  const u = encodeURIComponent(url), t = encodeURIComponent(title);
+  $("shareVideoTitle").textContent = title;
+  $("shareX").href = `https://twitter.com/intent/tweet?url=${u}&text=${t}`;
+  $("shareFb").href = `https://www.facebook.com/sharer/sharer.php?u=${u}`;
+  $("shareWa").href = `https://wa.me/?text=${t}%20${u}`;
+  $("shareMail").href = `mailto:?subject=${t}&body=${u}`;
+  const label = $("copyLabel");
+  label.textContent = "Copiază linkul";
+  label.classList.remove("copied");
+  lastFocus = document.activeElement;
+  $("shareOverlay").hidden = false;
+  document.body.style.overflow = "hidden";
+  $("shareClose").focus();
+}
+function closeShare() {
+  $("shareOverlay").hidden = true;
+  document.body.style.overflow = "";
+  if (lastFocus) lastFocus.focus();
+}
+
 async function boot(refresh = false) {
   if (!refresh) {
     $("year").textContent = new Date().getFullYear();
-    $("shareBtn").addEventListener("click", async () => {
-      const url = $("watchBtn").href;
-      const btn = $("shareBtn");
-      try {
-        if (navigator.share) { await navigator.share({ title: document.title, url }); return; }
-        await navigator.clipboard.writeText(url);
-        btn.textContent = "Link copiat ✓";
-      } catch { btn.textContent = "Copiază linkul"; }
-      setTimeout(() => (btn.textContent = "Copiază linkul"), 2000);
+    $("shareBtn").addEventListener("click", openShare);
+    $("shareClose").addEventListener("click", closeShare);
+    $("shareOverlay").addEventListener("click", (e) => { if (e.target === $("shareOverlay")) closeShare(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("shareOverlay").hidden) closeShare(); });
+    $("copyLinkBtn").addEventListener("click", async () => {
+      const ok = await copyText($("watchBtn").href);
+      const label = $("copyLabel");
+      label.textContent = ok ? "Link copiat ✓" : "Copierea a eșuat";
+      label.classList.toggle("copied", ok);
     });
   }
   try {

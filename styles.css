@@ -6,8 +6,8 @@
   --border: #2a2a2a;
   --text: #f1f1f1;
   --text-dim: #aaa;
-  --red: #f03;
-  --red-hover: #c00;
+  --red: #ff0000;
+  --red-hover: #cc0000;
   --chip: #272727;
   --radius: 14px;
   --wrap: 1180px;
@@ -93,12 +93,12 @@ body {
 .hero-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
 .live-dot {
   display: inline-flex; align-items: center; gap: 8px; flex: none; white-space: nowrap;
-  background: rgba(255,0,51,.14); border: 1px solid rgba(255,0,51,.45); color: #ff6b81;
+  background: rgba(255,0,0,.14); border: 1px solid rgba(255,0,0,.45); color: #ff6b81;
   font-size: 12px; font-weight: 800; letter-spacing: .08em;
   padding: 6px 12px; border-radius: 999px;
 }
 .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--red); animation: pulse 1.6s infinite; }
-@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,0,51,.6);} 70% { box-shadow: 0 0 0 9px rgba(255,0,51,0);} 100% { box-shadow: 0 0 0 0 rgba(255,0,51,0);} }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,0,0,.6);} 70% { box-shadow: 0 0 0 9px rgba(255,0,0,0);} 100% { box-shadow: 0 0 0 0 rgba(255,0,0,0);} }
 
 .hero-grid { display: grid; grid-template-columns: 1.55fr .95fr; gap: 22px; align-items: start; }
 .player-card {
@@ -127,7 +127,20 @@ body {
   margin: 0 0 16px; color: #d7d7d7; font-size: 14.5px;
   display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden;
 }
-.hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 0; }
+.hero-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 0; }
+/* Buton circular de sticlă (același stil ca cercul play de pe carduri) */
+.hero-actions .btn-watch, .hero-actions .btn-share-icon { height: 44px; }
+.btn-share-icon {
+  display: inline-grid; place-items: center; flex: none;
+  width: 50px; height: 44px; border-radius: 14px;
+  color: #fff; cursor: pointer;
+  background: rgba(15,15,15,.55);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,.28);
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+.btn-share-icon:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.45); }
+.btn-share-icon:active { transform: scale(.95); }
 
 /* Sections / grid */
 .section { padding: 30px 0 6px; }
@@ -213,6 +226,47 @@ body {
 .skeleton-card .thumb { border-radius: 12px; min-height: 150px; }
 .skeleton-card .line { height: 14px; border-radius: 6px; margin: 10px 2px 0; }
 .skeleton-card .line.short { width: 55%; }
+
+/* Share dialog (stil YouTube) */
+.share-overlay {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  background: rgba(0,0,0,.6);
+}
+.share-overlay[hidden] { display: none; }
+.share-dialog {
+  width: min(420px, 100%); max-height: 90vh; overflow: auto;
+  background: var(--bg-elev); border: 1px solid var(--border);
+  border-radius: 18px; padding: 20px;
+  box-shadow: 0 24px 70px rgba(0,0,0,.6);
+}
+.share-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.share-head h2 { margin: 0; font-size: 18px; }
+.icon-btn {
+  display: grid; place-items: center; width: 36px; height: 36px;
+  border: 0; border-radius: 50%; background: transparent; color: var(--text);
+  cursor: pointer;
+}
+.icon-btn:hover { background: var(--bg-hover); }
+.share-video-title { margin: 0 0 14px; color: var(--text-dim); font-size: 13.5px; }
+.share-options { display: grid; gap: 4px; }
+.share-option {
+  display: flex; align-items: center; gap: 14px; width: 100%;
+  padding: 10px 12px; border: 0; border-radius: 12px;
+  background: transparent; color: var(--text); font-size: 15px; font-weight: 600;
+  font-family: inherit; text-decoration: none; cursor: pointer; text-align: left;
+}
+.share-option:hover { background: var(--bg-hover); }
+.share-icon {
+  display: grid; place-items: center; flex: none;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.14);
+}
+#copyLabel.copied { color: #7ee2a8; }
+@media (max-width: 640px) {
+  .share-overlay { align-items: flex-end; padding: 0; }
+  .share-dialog { width: 100%; border-radius: 20px 20px 0 0; border-bottom: 0; }
+}
 
 /* Responsive */
 @media (max-width: 920px) {
