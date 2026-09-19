@@ -356,7 +356,7 @@ details.faq[open] .faq-plus { transform: rotate(45deg); }
 /* Responsive */
 @media (max-width: 920px) {
   .hero-grid { grid-template-columns: 1fr; gap: 0; }
-  /* Mobil: Rând1 = Brand + linkuri, Rând2 = Abonează-te sub brand */
+  /* Mobil: Rând1 = Brand + linkuri, Rând2 = Abonează-te sub linkuri */
   .topbar-inner { flex-wrap: wrap; row-gap: 2px; column-gap: 12px; align-items: center; }
   .brand { order: 1; flex: 0 1 auto; min-width: 0; }
   .nav { display: flex; align-items: center; order: 2; flex: 0 1 auto; flex-basis: auto; margin-left: auto; min-width: 0; overflow-x: auto; padding-bottom: 0; scrollbar-width: none; }
@@ -364,7 +364,7 @@ details.faq[open] .faq-plus { transform: rotate(45deg); }
   .nav-link { white-space: nowrap; padding: 8px 10px; }
   /* Break forțat pe rândul doi (fără HTML nou) */
   .topbar-inner::before { content: ""; order: 3; flex-basis: 100%; height: 0; }
-  .btn-sub { order: 4; flex: 0 0 auto; width: fit-content; max-width: 100%; margin: 6px auto 10px 0; }
+  .btn-sub { order: 4; flex: 0 0 auto; width: fit-content; max-width: 100%; margin: 6px 0 10px auto; }
   /* Unificăm playerul + info într-un singur card pe mobil */
   .player-card { border-radius: var(--radius) var(--radius) 0 0; border-bottom: 0; }
   .hero-info { border-radius: 0 0 var(--radius) var(--radius); }
