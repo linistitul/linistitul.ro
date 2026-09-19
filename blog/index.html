@@ -208,7 +208,7 @@
     try { cached = JSON.parse(localStorage.getItem("linistitul_channel_desc") || "null"); } catch (e) {}
     if (cached && cached.text) {
       el.textContent = cached.text;
-      if (Date.now() - (Number(cached.ts) || 0) < 7 * 24 * 3600 * 1000) return;
+      if (Date.now() - (Number(cached.ts) || 0) < 24 * 3600 * 1000) return;
     }
     var page = encodeURIComponent("https://www.youtube.com/@linistitul");
     var urls = ["https://api.allorigins.win/get?url=" + page, "https://api.codetabs.com/v1/proxy?quest=" + page];

@@ -490,7 +490,7 @@ function extractAvatar(html) {
  * așa că le citim rar din pagina canalului și le memorăm în browser
  * (max. 1 verificare / 7 zile). La orice eșec, rămân textele/poza
  * hardcodate — pagina nu e afectată. */
-const DESC_TTL = AVATAR_TTL; // revalidare descriere: max. 1× / 7 zile
+const DESC_TTL = 24 * 3600 * 1000; // revalidare descriere: max. 1× / zi
 let autoDesc = "";
 
 function decodeEntities(s) {
