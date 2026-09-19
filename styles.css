@@ -359,6 +359,11 @@ details.faq[open] .faq-plus { transform: rotate(45deg); }
 @media (max-width: 920px) {
   .hero-grid { grid-template-columns: 1fr; gap: 0; }
   /* Mobil: Rând1 = Brand + linkuri, Rând2 = Abonează-te sub linkuri */
+  /* Fâșie de sacrificiu deasupra headerului: bara dinamică mușcă fundal, nu conținut */
+  .topbar::before {
+    content: ""; position: absolute; left: 0; right: 0; top: -48px; height: 48px;
+    background: rgba(15,15,15,.86); pointer-events: none;
+  }
   .topbar-inner { flex-wrap: wrap; row-gap: 2px; column-gap: 12px; align-items: center; }
   .brand { order: 1; flex: 0 1 auto; min-width: 0; }
   .nav { display: flex; align-items: center; order: 2; flex: 0 1 auto; flex-basis: auto; margin-left: auto; min-width: 0; overflow-x: auto; padding-bottom: 0; scrollbar-width: none; }
