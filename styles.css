@@ -33,11 +33,13 @@ body {
 
 .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 20px; }
 
-/* Topbar — YouTube-like */
+/* Topbar — YouTube-like (rezistent la bare dinamice mobil: safe-area + strat propriu) */
 .topbar {
-  position: sticky; top: 0; z-index: 20;
+  position: sticky; top: 0; top: env(safe-area-inset-top, 0px); z-index: 20;
+  isolation: isolate;
   background: rgba(15,15,15,.86);
   backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
 }
 .topbar-inner {
@@ -365,6 +367,9 @@ details.faq[open] .faq-plus { transform: rotate(45deg); }
   /* Break forțat pe rândul doi (fără HTML nou) */
   .topbar-inner::before { content: ""; order: 3; flex-basis: 100%; height: 0; }
   .btn-sub { order: 4; flex: 0 0 auto; width: fit-content; max-width: 100%; margin: 6px 0 10px auto; }
+  /* Headerul mobil e mai înalt (2 rânduri) — ancorele țin cont de el */
+  html { scroll-padding-top: 140px; }
+  section[id] { scroll-margin-top: 140px; }
   /* Unificăm playerul + info într-un singur card pe mobil */
   .player-card { border-radius: var(--radius) var(--radius) 0 0; border-bottom: 0; }
   .hero-info { border-radius: 0 0 var(--radius) var(--radius); }
