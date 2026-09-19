@@ -233,7 +233,7 @@
         <img class="about-avatar" data-avatar="176" src="https://yt3.googleusercontent.com/ytc/AIdro_modnbNTuRlleNjTVouvkCrV_5UEVAxuMjbnRzZcO1hdq4=s176-c-k-c0x00ffffff-no-rj" alt="LINISTITUL" width="72" height="72" loading="lazy" />
         <div>
           <p class="footer-brand">LINISTITUL</p>
-          <p class="footer-desc">Creator de conținut. Eu zic că e fain și merită să arunci un ochi.</p>
+          <p class="footer-desc" id="channelDesc">Creator de conținut. Eu zic că e fain și merită să arunci un ochi.</p>
           <div class="about-links">
             <a href="https://www.youtube.com/@linistitul" target="_blank" rel="noopener">YouTube</a>
             <a href="https://go.linistitul.ro/ig" target="_blank" rel="noopener">Instagram</a>
@@ -300,6 +300,49 @@
     a.textContent = addr;
   });
   document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+  <script>
+  /* Descrierea canalului (auto, silențios) — același cache ca pagina principală. */
+  (function(){
+    var el = document.getElementById("channelDesc");
+    if (!el) return;
+    function decode(s){ var t = document.createElement("textarea"); t.innerHTML = s || ""; return t.value; }
+    function extract(h){
+      h = String(h || "");
+      var m = h.match(/<meta property="og:description" content="([^"]+)"/);
+      if (m && m[1]) return decode(m[1]).trim().slice(0, 300);
+      m = h.match(/<meta name="description" content="([^"]+)"/);
+      return (m && m[1]) ? decode(m[1]).trim().slice(0, 300) : "";
+    }
+    var cached = null;
+    try { cached = JSON.parse(localStorage.getItem("linistitul_channel_desc") || "null"); } catch (e) {}
+    if (cached && cached.text) {
+      el.textContent = cached.text;
+      if (Date.now() - (Number(cached.ts) || 0) < 7 * 24 * 3600 * 1000) return;
+    }
+    var page = encodeURIComponent("https://www.youtube.com/@linistitul");
+    var urls = ["https://api.allorigins.win/get?url=" + page, "https://api.codetabs.com/v1/proxy?quest=" + page];
+    (function next(i){
+      if (i >= urls.length) return;
+      var ctrl;
+      try { ctrl = new AbortController(); } catch (e) { return; }
+      var to = setTimeout(function(){ try { ctrl.abort(); } catch (e) {} }, 12000);
+      fetch(urls[i], { signal: ctrl.signal }).then(function(res){
+        if (!res.ok) throw 0;
+        var ct = res.headers.get("content-type") || "";
+        return ct.indexOf("application/json") !== -1
+          ? res.json().then(function(j){ return (j && j.contents) || ""; })
+          : res.text();
+      }).then(function(html){
+        clearTimeout(to);
+        var d = extract(html || "");
+        if (d) {
+          el.textContent = d;
+          try { localStorage.setItem("linistitul_channel_desc", JSON.stringify({ text: d, ts: Date.now() })); } catch (e) {}
+        } else next(i + 1);
+      }).catch(function(){ clearTimeout(to); next(i + 1); });
+    })(0);
+  })();
   </script>
 </body>
 </html>

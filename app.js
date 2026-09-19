@@ -73,6 +73,7 @@ function applyLang() {
   const lb = $("langBtn");
   if (lb) { lb.setAttribute("aria-label", T("langMenu")); lb.title = T("langMenu"); }
   if (!lastVideos) document.title = T("baseTitle");
+  applyChannelDesc();
 }
 
 function escapeHtml(s) {
@@ -484,29 +485,85 @@ function extractAvatar(html) {
   return m ? m[0].replace(/\\\//g, "/").replace(/\\u003d/gi, "=") : "";
 }
 
-async function refreshAvatar() {
-  let cached = "", ts = 0;
+/* ---------- Avatar + descriere canal (auto, silențios) ----------
+ * Feed-ul RSS nu conține nici avatarul, nici descrierea canalului,
+ * așa că le citim rar din pagina canalului și le memorăm în browser
+ * (max. 1 verificare / 7 zile). La orice eșec, rămân textele/poza
+ * hardcodate — pagina nu e afectată. */
+const DESC_TTL = AVATAR_TTL; // revalidare descriere: max. 1× / 7 zile
+let autoDesc = "";
+
+function decodeEntities(s) {
+  const ta = document.createElement("textarea");
+  ta.innerHTML = String(s || "");
+  return ta.value;
+}
+
+function extractDescription(html) {
+  const src = String(html || "");
+  const og = src.match(/<meta property="og:description" content="([^"]+)"/)?.[1];
+  if (og) return decodeEntities(og).trim().slice(0, 300);
+  const meta = src.match(/<meta name="description" content="([^"]+)"/)?.[1];
+  if (meta) return decodeEntities(meta).trim().slice(0, 300);
+  return "";
+}
+
+function applyChannelDesc() {
+  const el = $("channelDesc");
+  if (!el || !autoDesc) return;
+  if (LANG !== "en") { el.textContent = autoDesc; return; }
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem("linistitul_channel_desc_en") || "null"); } catch {}
+  if (saved && saved.s === autoDesc && saved.t) { el.textContent = saved.t; return; }
+  translateOne(autoDesc).then((t) => {
+    if (!t || LANG !== "en") return;
+    try { localStorage.setItem("linistitul_channel_desc_en", JSON.stringify({ s: autoDesc, t })); } catch {}
+    const el2 = $("channelDesc");
+    if (el2) el2.textContent = t;
+  }).catch(() => {});
+}
+
+async function refreshChannelInfo() {
+  let av = "", avTs = 0, descTs = 0;
   try {
-    cached = localStorage.getItem("linistitul_avatar_url") || "";
-    ts = Number(localStorage.getItem("linistitul_avatar_ts")) || 0;
+    av = localStorage.getItem("linistitul_avatar_url") || "";
+    avTs = Number(localStorage.getItem("linistitul_avatar_ts")) || 0;
+    const dc = JSON.parse(localStorage.getItem("linistitul_channel_desc") || "null");
+    if (dc && dc.text) { autoDesc = dc.text; descTs = Number(dc.ts) || 0; }
   } catch { /* stocare indisponibilă — continuăm fără cache */ }
-  if (cached) applyAvatar(cached);
-  if (cached && Date.now() - ts < AVATAR_TTL) return;
+  if (av) applyAvatar(av);
+  applyChannelDesc();
+  let avDone = av && Date.now() - avTs < AVATAR_TTL;
+  let descDone = autoDesc && Date.now() - descTs < DESC_TTL;
+  if (avDone && descDone) return;
   const page = encodeURIComponent("https://www.youtube.com/@linistitul");
   for (const u of [`https://api.allorigins.win/get?url=${page}`, `https://api.codetabs.com/v1/proxy?quest=${page}`]) {
     try {
       const res = await fetchWithTimeout(u, 12000);
       const ct = res.headers.get("content-type") || "";
       const html = ct.includes("application/json") ? (await res.json()).contents || "" : await res.text();
-      const avatar = extractAvatar(html);
-      if (avatar.includes("yt3.googleusercontent.com")) {
-        applyAvatar(avatar);
-        try {
-          localStorage.setItem("linistitul_avatar_url", avatar);
-          localStorage.setItem("linistitul_avatar_ts", String(Date.now()));
-        } catch { /* ignorăm */ }
-        return;
+      if (!html) continue;
+      if (!avDone) {
+        const avatar = extractAvatar(html);
+        if (avatar.includes("yt3.googleusercontent.com")) {
+          applyAvatar(avatar);
+          try {
+            localStorage.setItem("linistitul_avatar_url", avatar);
+            localStorage.setItem("linistitul_avatar_ts", String(Date.now()));
+          } catch { /* ignorăm */ }
+          avDone = true;
+        }
       }
+      if (!descDone) {
+        const d = extractDescription(html);
+        if (d) {
+          autoDesc = d;
+          applyChannelDesc();
+          try { localStorage.setItem("linistitul_channel_desc", JSON.stringify({ text: d, ts: Date.now() })); } catch {}
+          descDone = true;
+        }
+      }
+      if (avDone && descDone) return;
     } catch { /* încercăm următoarea sursă */ }
   }
 }
@@ -558,7 +615,7 @@ pollBoot();
 setTimeout(() => hideBootLoader(false), 6000); // cap absolut: nu blochează pagina niciodată
 
 document.addEventListener("DOMContentLoaded", () => {
-  refreshAvatar(); // sincron aplică poza memorată local, dacă există
+  refreshChannelInfo(); // sincron aplică poza + descrierea memorate local, dacă există
   boot(false);
   // Revalidare silențioasă la fiecare 10 minute, pentru tab-uri lăsate deschise.
   setInterval(() => boot(true), 10 * 60 * 1000);
