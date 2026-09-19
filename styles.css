@@ -42,10 +42,6 @@ body {
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
 }
-/* Firefox: fundal solid pe header — blur + bara dinamică fac artefacte de pictare */
-@supports (-moz-appearance: none) {
-  .topbar { background: #0f0f0f; backdrop-filter: none; -webkit-backdrop-filter: none; }
-}
 .topbar-inner {
   display: flex; align-items: center; gap: 18px;
   min-height: 64px; padding-top: 10px; padding-bottom: 10px;
@@ -363,8 +359,6 @@ details.faq[open] .faq-plus { transform: rotate(45deg); }
 @media (max-width: 920px) {
   .hero-grid { grid-template-columns: 1fr; gap: 0; }
   /* Mobil: Rând1 = Brand + linkuri, Rând2 = Abonează-te sub linkuri */
-  /* padding-top = zonă de sacrificiu: dacă bara dinamică mai mușcă 1-2px, mănâncă fundal, nu conținut */
-  .topbar { padding-top: 6px; }
   .topbar-inner { flex-wrap: wrap; row-gap: 2px; column-gap: 12px; align-items: center; }
   .brand { order: 1; flex: 0 1 auto; min-width: 0; }
   .nav { display: flex; align-items: center; order: 2; flex: 0 1 auto; flex-basis: auto; margin-left: auto; min-width: 0; overflow-x: auto; padding-bottom: 0; scrollbar-width: none; }
