@@ -20,7 +20,7 @@ const CHANNEL_HANDLE = "@linistitul";
 const RSS_URL = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
 const UPLOADS_PLAYLIST = "UUKoGpCyBAfCp-uc6DM1Lygw"; // UC -> UU
 let AVATAR_88 = "https://yt3.googleusercontent.com/ytc/AIdro_modnbNTuRlleNjTVouvkCrV_5UEVAxuMjbnRzZcO1hdq4=s88-c-k-c0x00ffffff-no-rj";
-const AVATAR_TTL = 7 * 24 * 3600 * 1000; // revalidare poză profil: max. 1× / 7 zile
+const AVATAR_TTL = 24 * 3600 * 1000; // revalidare poză profil: max. 1× / zi
 
 // Rezervă locală — doar pentru modul offline (ultimele 3, cel mai nou primul).
 const FALLBACK_VIDEOS = [
