@@ -45,8 +45,9 @@
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Acasă","item":"https://www.linistitul.ro/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://www.linistitul.ro/blog"},{"@type":"ListItem","position":3,"name":"De ce să urăști școala, NU materiile","item":"https://www.linistitul.ro/blog/de-ce-să-urăști-școala-nu-materiile"}]}
   </script>
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+  <link rel="icon" type="image/png" href="https://cdn.inoculens.com/logo" />
   <link rel="apple-touch-icon" href="https://yt3.googleusercontent.com/ytc/AIdro_modnbNTuRlleNjTVouvkCrV_5UEVAxuMjbnRzZcO1hdq4=s180-c-k-c0x00ffffff-no-rj" />
+  <script>/* Favicon = poza de profil YouTube (cache local, aplicare instant) */try{var av=localStorage.getItem("linistitul_avatar_url");if(av&&av.indexOf("yt3.googleusercontent.com")!==-1){var sz=function(u,s){return String(u).replace(/=s\d+.*$/,"=s"+s+"-c-k-c0x00ffffff-no-rj")};var ic=document.querySelector('link[rel="icon"]');if(!ic){ic=document.createElement("link");ic.rel="icon";document.head.appendChild(ic)}ic.href=sz(av,64);ic.removeAttribute("type");var ap=document.querySelector('link[rel="apple-touch-icon"]');if(!ap){ap=document.createElement("link");ap.rel="apple-touch-icon";document.head.appendChild(ap)}ap.href=sz(av,180)}}catch(e){}</script>
   <link rel="preconnect" href="https://yt3.googleusercontent.com" />
   <style>
     html{background:#0f0f0f}
@@ -338,6 +339,52 @@
           try { localStorage.setItem("linistitul_channel_desc", JSON.stringify({ text: d, ts: Date.now() })); } catch (e) {}
         } else next(i + 1);
       }).catch(function(){ clearTimeout(to); next(i + 1); });
+    })(0);
+  })();
+  </script>
+  <script>
+  /* Avatar + favicon canal (auto, silențios) — același cache ca pagina principală. */
+  (function(){
+    function sized(u,s){return String(u).replace(/=s\d+.*$/,"=s"+s+"-c-k-c0x00ffffff-no-rj");}
+    function apply(av){
+      if(!av||av.indexOf("yt3.googleusercontent.com")===-1)return;
+      document.querySelectorAll('img[data-avatar]').forEach(function(img){img.src=sized(av,Number(img.getAttribute("data-avatar"))||88);});
+      var ic=document.querySelector('link[rel="icon"]');
+      if(!ic){ic=document.createElement("link");ic.rel="icon";document.head.appendChild(ic);}
+      ic.href=sized(av,64);ic.removeAttribute("type");
+      var ap=document.querySelector('link[rel="apple-touch-icon"]');
+      if(!ap){ap=document.createElement("link");ap.rel="apple-touch-icon";document.head.appendChild(ap);}
+      ap.href=sized(av,180);
+    }
+    var av="",ts=0;
+    try{av=localStorage.getItem("linistitul_avatar_url")||"";ts=Number(localStorage.getItem("linistitul_avatar_ts"))||0;}catch(e){}
+    if(av){apply(av);if(Date.now()-ts<24*3600*1000)return;}
+    function extract(h){
+      var m=h.match(/<meta property="og:image" content="([^"]+)"/);
+      if(m&&m[1])return m[1];
+      m=h.match(/https:\\?\/\\?\/yt3\.googleusercontent\.com\\?\/[^"'\s\\]+/);
+      return m?m[0].replace(/\\\//g,"/").replace(/\\u003d/gi,"="):"";
+    }
+    var page=encodeURIComponent("https://www.youtube.com/@linistitul");
+    var urls=["https://api.allorigins.win/get?url="+page,"https://api.codetabs.com/v1/proxy?quest="+page];
+    (function next(i){
+      if(i>=urls.length)return;
+      var ctrl;try{ctrl=new AbortController();}catch(e){return;}
+      var to=setTimeout(function(){try{ctrl.abort();}catch(e){}},12000);
+      fetch(urls[i],{signal:ctrl.signal}).then(function(res){
+        if(!res.ok)throw 0;
+        var ct=res.headers.get("content-type")||"";
+        return ct.indexOf("application/json")!==-1
+          ?res.json().then(function(j){return (j&&j.contents)||"";})
+          :res.text();
+      }).then(function(html){
+        clearTimeout(to);
+        var a=extract(html||"");
+        if(a&&a.indexOf("yt3.googleusercontent.com")!==-1){
+          apply(a);
+          try{localStorage.setItem("linistitul_avatar_url",a);localStorage.setItem("linistitul_avatar_ts",String(Date.now()));}catch(e){}
+        }else next(i+1);
+      }).catch(function(){clearTimeout(to);next(i+1);});
     })(0);
   })();
   </script>

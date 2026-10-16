@@ -44,7 +44,7 @@ const I18N = {
     umbrellaPre: "LINISTITUL este un brand ", umbrellaPost: ".",
     brandAria: "LINISTITUL — pagina principală",
     langMenu: "Alege limba",
-    baseTitle: "LINISTITUL — Cele mai noi videoclipuri",
+    baseTitle: "LINISTITUL - Cele mai recente videoclipuri",
     openYT: "deschide pe YouTube", viewsWord: "vizionări", badge: "CEL MAI NOU",
   },
   en: {
@@ -58,7 +58,7 @@ const I18N = {
     umbrellaPre: "LINISTITUL is an ", umbrellaPost: " brand.",
     brandAria: "LINISTITUL — homepage",
     langMenu: "Choose language",
-    baseTitle: "LINISTITUL — Latest videos",
+    baseTitle: "LINISTITUL - Latest videos",
     openYT: "open on YouTube", viewsWord: "views", badge: "LATEST",
   },
 };
@@ -72,7 +72,7 @@ function applyLang() {
   document.querySelectorAll("[data-i18n-aria]").forEach((el) => { el.setAttribute("aria-label", T(el.dataset.i18nAria)); });
   const lb = $("langBtn");
   if (lb) { lb.setAttribute("aria-label", T("langMenu")); lb.title = T("langMenu"); }
-  if (!lastVideos) document.title = T("baseTitle");
+  document.title = T("baseTitle");
   applyChannelDesc();
 }
 
@@ -229,7 +229,6 @@ function renderFeatured(v) {
   $("videoMeta").textContent = bits.join("  •  ");
   const watch = $("watchBtn");
   watch.href = videoUrl(v.id);
-  document.title = `${v.title} — LINISTITUL`;
 }
 
 function renderGrid(videos) {
@@ -458,12 +457,34 @@ function sizedAvatar(url, size) {
   return String(url).replace(/=s\d+.*$/, `=s${size}-c-k-c0x00ffffff-no-rj`);
 }
 
+function applyFavicon(url) {
+  try {
+    if (!url || !url.includes("yt3.googleusercontent.com")) return;
+    let icon = document.querySelector('link[rel="icon"]');
+    if (!icon) {
+      icon = document.createElement("link");
+      icon.rel = "icon";
+      document.head.appendChild(icon);
+    }
+    icon.href = sizedAvatar(url, 64);
+    icon.removeAttribute("type");
+    let apple = document.querySelector('link[rel="apple-touch-icon"]');
+    if (!apple) {
+      apple = document.createElement("link");
+      apple.rel = "apple-touch-icon";
+      document.head.appendChild(apple);
+    }
+    apple.href = sizedAvatar(url, 180);
+  } catch { /* ignorăm — rămâne logo-ul static */ }
+}
+
 function applyAvatar(url) {
   if (!url || !url.includes("yt3.googleusercontent.com")) return;
   AVATAR_88 = sizedAvatar(url, 88);
   document.querySelectorAll("img[data-avatar]").forEach((img) => {
     img.src = sizedAvatar(url, Number(img.dataset.avatar) || 88);
   });
+  applyFavicon(url);
 }
 
 function extractAvatar(html) {
