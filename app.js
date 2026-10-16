@@ -36,7 +36,7 @@ const I18N = {
   ro: {
     skip: "Sari la conținut", navVideos: "Videoclipuri", subscribe: "Abonează-te",
     kicker: "Cel mai recent videoclip", loadingTitle: "Se încarcă cel mai nou videoclip…",
-    loadingDesc: "Se încarcă descrierea…", watch: "Vezi pe YouTube", shareAria: "Distribuie",
+    watch: "Vezi pe YouTube", shareAria: "Distribuie",
     latestH2: "Ultimele videoclipuri", allVideos: "Toate videoclipurile",
     shareTitle: "Distribuie", closeAria: "Închide fereastra", copyLink: "Copiază linkul",
     copiedOk: "Link copiat ✓", copiedFail: "Copierea a eșuat",
@@ -50,7 +50,7 @@ const I18N = {
   en: {
     skip: "Skip to content", navVideos: "Videos", subscribe: "Subscribe",
     kicker: "Latest video", loadingTitle: "Loading the latest video…",
-    loadingDesc: "Loading description…", watch: "Watch on YouTube", shareAria: "Share",
+    watch: "Watch on YouTube", shareAria: "Share",
     latestH2: "Latest videos", allVideos: "All videos",
     shareTitle: "Share", closeAria: "Close dialog", copyLink: "Copy link",
     copiedOk: "Link copied ✓", copiedFail: "Copy failed",
@@ -217,13 +217,6 @@ async function fetchLatestVideos() {
 
 /* ---------- Rendering ---------- */
 
-function setDescription(text) {
-  const el = $("videoDescription");
-  const clean = String(text || "").slice(0, 320);
-  el.textContent = clean;
-  el.style.display = clean ? "" : "none";
-}
-
 function renderFeatured(v) {
   $("playerSkeleton")?.remove();
   const player = $("featuredPlayer");
@@ -234,7 +227,6 @@ function renderFeatured(v) {
   if (v.published) bits.push(`${formatDate(v.published)} • ${timeAgo(v.published)}`);
   if (v.views) bits.push(`${v.views.toLocaleString(LANG === "ro" ? "ro-RO" : "en-US")} ${T("viewsWord")}`);
   $("videoMeta").textContent = bits.join("  •  ");
-  setDescription(v.description);
   const watch = $("watchBtn");
   watch.href = videoUrl(v.id);
   document.title = `${v.title} — LINISTITUL`;
@@ -376,15 +368,12 @@ async function translateOne(text) {
 async function withTranslations(videos) {
   const jobs = videos.map(async (v) => {
     const cached = trCacheGet(v.id);
-    if (cached && cached.s === (v.title || "") && cached.sd === (v.description || "")) {
-      return { ...v, title: cached.t, description: cached.d };
+    if (cached && cached.s === (v.title || "") && cached.t) {
+      return { ...v, title: cached.t };
     }
-    const [t, d] = await Promise.all([
-      translateOne(v.title).catch(() => v.title || ""),
-      translateOne(v.description).catch(() => v.description || ""),
-    ]);
-    trCacheSet(v.id, { s: v.title || "", t, sd: v.description || "", d });
-    return { ...v, title: t, description: d };
+    const t = await translateOne(v.title).catch(() => v.title || "");
+    trCacheSet(v.id, { s: v.title || "", t });
+    return { ...v, title: t };
   });
   const timeout = new Promise((res) => setTimeout(() => res(videos), 7000));
   return Promise.race([Promise.all(jobs), timeout]);
@@ -457,7 +446,6 @@ async function boot(refresh = false) {
     if (!refresh) {
       $("videoTitle").textContent = FALLBACK_VIDEOS[0].title;
       $("watchBtn").href = videoUrl(FALLBACK_VIDEOS[0].id);
-      setDescription("");
     }
   }
 }
