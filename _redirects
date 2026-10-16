@@ -1,0 +1,6 @@
+# Legacy trailing-slash URLs (folder-index era) -> clean URLs.
+# Netlify serves contact.html/blog.html/*.html at the slashless URL with 200.
+/contact/  /contact  301
+/blog/  /blog  301
+/blog/cum-sa-aplici-la-dinu-lipatti/  /blog/cum-sa-aplici-la-dinu-lipatti  301
+/blog/de-ce-să-urăști-școala-nu-materiile/  /blog/de-ce-să-urăști-școala-nu-materiile  301
