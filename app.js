@@ -582,7 +582,7 @@ async function refreshChannelInfo() {
   let descDone = autoDesc && Date.now() - descTs < DESC_TTL;
   if (avDone && descDone) return;
   const page = encodeURIComponent("https://www.youtube.com/@linistitul");
-  for (const u of [`https://api.allorigins.win/get?url=${page}`, `https://api.codetabs.com/v1/proxy?quest=${page}`]) {
+  for (const u of [`https://api.allorigins.win/get?url=${page}`, `https://api.codetabs.com/v1/proxy?quest=${page}`, `https://corsproxy.io/?url=${page}`]) {
     try {
       const res = await fetchWithTimeout(u, 12000);
       const ct = res.headers.get("content-type") || "";

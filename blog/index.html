@@ -211,7 +211,7 @@
       if (Date.now() - (Number(cached.ts) || 0) < 24 * 3600 * 1000) return;
     }
     var page = encodeURIComponent("https://www.youtube.com/@linistitul");
-    var urls = ["https://api.allorigins.win/get?url=" + page, "https://api.codetabs.com/v1/proxy?quest=" + page];
+    var urls = ["https://api.allorigins.win/get?url=" + page, "https://api.codetabs.com/v1/proxy?quest=" + page, "https://corsproxy.io/?url=" + page];
     (function next(i){
       if (i >= urls.length) return;
       var ctrl;
@@ -258,7 +258,7 @@
       return m?m[0].replace(/\\\//g,"/").replace(/\\u003d/gi,"="):"";
     }
     var page=encodeURIComponent("https://www.youtube.com/@linistitul");
-    var urls=["https://api.allorigins.win/get?url="+page,"https://api.codetabs.com/v1/proxy?quest="+page];
+    var urls=["https://api.allorigins.win/get?url="+page,"https://api.codetabs.com/v1/proxy?quest="+page,"https://corsproxy.io/?url="+page];
     (function next(i){
       if(i>=urls.length)return;
       var ctrl;try{ctrl=new AbortController();}catch(e){return;}
