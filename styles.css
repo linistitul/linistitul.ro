@@ -155,6 +155,9 @@ body {
 .contact-row { margin: 0; }
 .contact-link { color: #3ea6ff; font-size: clamp(20px, 3vw, 26px); font-weight: 700; text-decoration: none; overflow-wrap: anywhere; }
 .contact-link:hover { text-decoration: underline; }
+
+/* Titlu accesibil doar pentru cititoare de ecran și motoare de căutare */
+.visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 /* Buton circular de sticlă (același stil ca cercul play de pe carduri) */
 .hero-actions .btn-watch, .hero-actions .btn-share-icon { height: 44px; }
 .btn-share-icon {
