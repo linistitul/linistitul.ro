@@ -2,13 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.linistitul.ro/</loc>
-    <lastmod>2026-09-17</lastmod>
+    <lastmod>2026-10-16</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.linistitul.ro/blog</loc>
-    <lastmod>2026-09-17</lastmod>
+    <lastmod>2026-10-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -19,7 +19,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.linistitul.ro/blog/de-ce-s%C4%83-ur%C4%83%C8%99ti-%C8%99coala-nu-materiile</loc>
+    <loc>https://www.linistitul.ro/blog/de-ce-să-urăști-școala-nu-materiile</loc>
     <lastmod>2020-12-31</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>

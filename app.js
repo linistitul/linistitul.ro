@@ -229,6 +229,42 @@ function renderFeatured(v) {
   $("videoMeta").textContent = bits.join("  •  ");
   const watch = $("watchBtn");
   watch.href = videoUrl(v.id);
+  setVideoJsonLd(v);
+}
+
+/* ---------- VideoObject pentru SEO (rezultate rich cu videoclip) ----------
+ * Datele vin din feed-ul YouTube, deci schema e mereu în pas cu playerul.
+ * Google procesează JSON-LD injectat prin JS la randarea paginii. */
+function setVideoJsonLd(v) {
+  try {
+    const data = {
+      "@context": "https://schema.org",
+      "@type": "VideoObject",
+      name: v.title,
+      thumbnailUrl: [`https://i.ytimg.com/vi/${v.id}/hq720.jpg`, thumbUrl(v.id)],
+      uploadDate: v.published || undefined,
+      embedUrl: embedUrl(v.id),
+      contentUrl: videoUrl(v.id),
+      inLanguage: LANG,
+      author: { "@type": "Organization", "@id": "https://www.linistitul.ro/#organization", name: "LINISTITUL", url: "https://www.linistitul.ro/" },
+    };
+    if (v.description) data.description = String(v.description).slice(0, 500);
+    if (v.views) {
+      data.interactionStatistic = {
+        "@type": "InteractionCounter",
+        interactionType: { "@type": "WatchAction" },
+        userInteractionCount: v.views,
+      };
+    }
+    let tag = document.getElementById("videoJsonLd");
+    if (!tag) {
+      tag = document.createElement("script");
+      tag.id = "videoJsonLd";
+      tag.type = "application/ld+json";
+      document.head.appendChild(tag);
+    }
+    tag.textContent = JSON.stringify(data);
+  } catch { /* SEO best-effort — pagina nu e afectată */ }
 }
 
 function renderGrid(videos) {
