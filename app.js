@@ -511,6 +511,7 @@ function applyFavicon(url) {
       document.head.appendChild(apple);
     }
     apple.href = sizedAvatar(url, 180);
+    try { if (window.__linRoundFav) window.__linRoundFav(sizedAvatar(url, 180)); } catch {}
   } catch { /* ignorăm — rămâne logo-ul static */ }
 }
 
