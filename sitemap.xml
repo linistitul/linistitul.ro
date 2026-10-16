@@ -13,6 +13,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.linistitul.ro/contact</loc>
+    <lastmod>2026-10-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://www.linistitul.ro/blog/cum-sa-aplici-la-dinu-lipatti</loc>
     <lastmod>2022-03-15</lastmod>
     <changefreq>yearly</changefreq>
