@@ -576,7 +576,15 @@ async function refreshChannelInfo() {
     const dc = JSON.parse(localStorage.getItem("linistitul_channel_desc") || "null");
     if (dc && dc.text) { autoDesc = dc.text; descTs = Number(dc.ts) || 0; }
   } catch { /* stocare indisponibilă — continuăm fără cache */ }
-  if (av) applyAvatar(av);
+  if (av && av.includes("yt3.googleusercontent.com")) applyAvatar(av);
+  else {
+    // Favicon determinist din linkul static apple-touch-icon (fără rețea).
+    try {
+      const ap = document.querySelector('link[rel="apple-touch-icon"]');
+      const href = ap ? ap.getAttribute("href") || "" : "";
+      if (href.includes("yt3.googleusercontent.com")) applyFavicon(href);
+    } catch { /* rămâne logo-ul static */ }
+  }
   applyChannelDesc();
   let avDone = av && Date.now() - avTs < AVATAR_TTL;
   let descDone = autoDesc && Date.now() - descTs < DESC_TTL;

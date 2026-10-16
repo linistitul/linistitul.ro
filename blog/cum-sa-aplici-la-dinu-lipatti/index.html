@@ -49,7 +49,7 @@
   </script>
   <link rel="icon" type="image/png" href="https://cdn.inoculens.com/logo" />
   <link rel="apple-touch-icon" href="https://yt3.googleusercontent.com/ytc/AIdro_modnbNTuRlleNjTVouvkCrV_5UEVAxuMjbnRzZcO1hdq4=s180-c-k-c0x00ffffff-no-rj" />
-  <script>/* Favicon = poza de profil YouTube (cache local, aplicare instant) */try{var av=localStorage.getItem("linistitul_avatar_url");if(av&&av.indexOf("yt3.googleusercontent.com")!==-1){var sz=function(u,s){return String(u).replace(/=s\d+.*$/,"=s"+s+"-c-k-c0x00ffffff-no-rj")};var ic=document.querySelector('link[rel="icon"]');if(!ic){ic=document.createElement("link");ic.rel="icon";document.head.appendChild(ic)}ic.href=sz(av,64);ic.removeAttribute("type");var ap=document.querySelector('link[rel="apple-touch-icon"]');if(!ap){ap=document.createElement("link");ap.rel="apple-touch-icon";document.head.appendChild(ap)}ap.href=sz(av,180)}}catch(e){}</script>
+  <script>/* Favicon = poza de profil YouTube (instant, fără rețea) */try{var av=null;try{av=localStorage.getItem("linistitul_avatar_url")}catch(e){}if(!av||av.indexOf("yt3.googleusercontent.com")===-1){var aph=document.querySelector('link[rel="apple-touch-icon"]');av=aph?aph.getAttribute("href"):null}if(av&&av.indexOf("yt3.googleusercontent.com")!==-1){var sz=function(u,s){return String(u).replace(/=s\d+.*$/,"=s"+s+"-c-k-c0x00ffffff-no-rj")};var ic=document.querySelector('link[rel="icon"]');if(!ic){ic=document.createElement("link");ic.rel="icon";document.head.appendChild(ic)}ic.href=sz(av,64);ic.removeAttribute("type");var ap=document.querySelector('link[rel="apple-touch-icon"]');if(!ap){ap=document.createElement("link");ap.rel="apple-touch-icon";document.head.appendChild(ap)}ap.href=sz(av,180)}}catch(e){}</script>
   <link rel="preconnect" href="https://yt3.googleusercontent.com" />
   <style>
     html{background:#0f0f0f}
@@ -361,7 +361,8 @@
     }
     var av="",ts=0;
     try{av=localStorage.getItem("linistitul_avatar_url")||"";ts=Number(localStorage.getItem("linistitul_avatar_ts"))||0;}catch(e){}
-    if(av){apply(av);if(Date.now()-ts<24*3600*1000)return;}
+    if(av&&av.indexOf("yt3.googleusercontent.com")!==-1){apply(av);if(Date.now()-ts<24*3600*1000)return;}
+    else{var ap0=document.querySelector('link[rel="apple-touch-icon"]');var pav=ap0?(ap0.getAttribute("href")||""):"";if(pav.indexOf("yt3.googleusercontent.com")!==-1)apply(pav);}
     function extract(h){
       var m=h.match(/<meta property="og:image" content="([^"]+)"/);
       if(m&&m[1])return m[1];
